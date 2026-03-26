@@ -126,7 +126,7 @@
             btnCalculatorDivision.TabIndex = 3;
             btnCalculatorDivision.Text = "÷";
             btnCalculatorDivision.UseVisualStyleBackColor = false;
-            btnCalculatorDivision.Click += btnCalculator_Click;
+            btnCalculatorDivision.Click += btnCalculatorDivision_Click;
             // 
             // btnCalculatorNo7
             // 
@@ -139,6 +139,7 @@
             btnCalculatorNo7.TabIndex = 3;
             btnCalculatorNo7.Text = "7";
             btnCalculatorNo7.UseVisualStyleBackColor = false;
+            btnCalculatorNo7.Click += NumberButton_Click;
             // 
             // btnCalculatorNo8
             // 
@@ -151,6 +152,7 @@
             btnCalculatorNo8.TabIndex = 3;
             btnCalculatorNo8.Text = "8";
             btnCalculatorNo8.UseVisualStyleBackColor = false;
+            btnCalculatorNo8.Click += NumberButton_Click;
             // 
             // btnCalculatorNo9
             // 
@@ -163,7 +165,7 @@
             btnCalculatorNo9.TabIndex = 3;
             btnCalculatorNo9.Text = "9";
             btnCalculatorNo9.UseVisualStyleBackColor = false;
-            btnCalculatorNo9.Click += btnCalculatorNo9_Click;
+            btnCalculatorNo9.Click += NumberButton_Click;
             // 
             // btnCalculatorMultiplied
             // 
@@ -189,7 +191,7 @@
             btnCalculatorNo4.TabIndex = 3;
             btnCalculatorNo4.Text = "4";
             btnCalculatorNo4.UseVisualStyleBackColor = false;
-            btnCalculatorNo4.Click += button9_Click;
+            btnCalculatorNo4.Click += NumberButton_Click;
             // 
             // btnCalculatorNo5
             // 
@@ -202,6 +204,7 @@
             btnCalculatorNo5.TabIndex = 3;
             btnCalculatorNo5.Text = "5";
             btnCalculatorNo5.UseVisualStyleBackColor = false;
+            btnCalculatorNo5.Click += NumberButton_Click;
             // 
             // btnCalculatorNo6
             // 
@@ -214,7 +217,7 @@
             btnCalculatorNo6.TabIndex = 3;
             btnCalculatorNo6.Text = "6";
             btnCalculatorNo6.UseVisualStyleBackColor = false;
-            btnCalculatorNo6.Click += button11_Click;
+            btnCalculatorNo6.Click += NumberButton_Click;
             // 
             // btnCalculatorMinus
             // 
@@ -227,7 +230,7 @@
             btnCalculatorMinus.TabIndex = 3;
             btnCalculatorMinus.Text = "-";
             btnCalculatorMinus.UseVisualStyleBackColor = false;
-            btnCalculatorMinus.Click += button12_Click;
+            btnCalculatorMinus.Click += btnCalculatorMinus_Click;
             // 
             // btnCalculatorNo1
             // 
@@ -240,7 +243,7 @@
             btnCalculatorNo1.TabIndex = 3;
             btnCalculatorNo1.Text = "1";
             btnCalculatorNo1.UseVisualStyleBackColor = false;
-            btnCalculatorNo1.Click += button13_Click;
+            btnCalculatorNo1.Click += NumberButton_Click;
             // 
             // btnCalculatorNo2
             // 
@@ -253,7 +256,7 @@
             btnCalculatorNo2.TabIndex = 3;
             btnCalculatorNo2.Text = "2";
             btnCalculatorNo2.UseVisualStyleBackColor = false;
-            btnCalculatorNo2.Click += button14_Click;
+            btnCalculatorNo2.Click += NumberButton_Click;
             // 
             // btnCalculatorNo3
             // 
@@ -266,6 +269,7 @@
             btnCalculatorNo3.TabIndex = 3;
             btnCalculatorNo3.Text = "3";
             btnCalculatorNo3.UseVisualStyleBackColor = false;
+            btnCalculatorNo3.Click += NumberButton_Click;
             // 
             // btnCalculatorPlus
             // 
@@ -278,7 +282,7 @@
             btnCalculatorPlus.TabIndex = 3;
             btnCalculatorPlus.Text = "+";
             btnCalculatorPlus.UseVisualStyleBackColor = false;
-            btnCalculatorPlus.Click += button16_Click;
+            btnCalculatorPlus.Click += btnCalculatorPlus_Click;
             // 
             // btnCalculatorSignChange
             // 
@@ -291,6 +295,7 @@
             btnCalculatorSignChange.TabIndex = 3;
             btnCalculatorSignChange.Text = "+/-";
             btnCalculatorSignChange.UseVisualStyleBackColor = false;
+            btnCalculatorSignChange.Click += btnCalculatorSignChange_Click;
             // 
             // btnCalculatorNo0
             // 
@@ -303,6 +308,7 @@
             btnCalculatorNo0.TabIndex = 3;
             btnCalculatorNo0.Text = "0";
             btnCalculatorNo0.UseVisualStyleBackColor = false;
+            btnCalculatorNo0.Click += NumberButton_Click;
             // 
             // btnCalculatorDecimal
             // 
@@ -314,6 +320,7 @@
             btnCalculatorDecimal.TabIndex = 3;
             btnCalculatorDecimal.Text = ".";
             btnCalculatorDecimal.UseVisualStyleBackColor = false;
+            btnCalculatorDecimal.Click += btnCalculatorDecimal_Click;
             // 
             // btnCalculatorEqual
             // 
@@ -326,6 +333,7 @@
             btnCalculatorEqual.TabIndex = 3;
             btnCalculatorEqual.Text = "=";
             btnCalculatorEqual.UseVisualStyleBackColor = false;
+            btnCalculatorEqual.Click += btnCalculatorEqual_Click;
             // 
             // Calculator
             // 
