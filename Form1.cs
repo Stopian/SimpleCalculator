@@ -46,14 +46,75 @@ namespace WinFormsApp1
         }
         private void btnCalculatorMultiplied_Click(object sender, EventArgs e)
         {
-            
+
+            if (calculationCompleted)
+            {
+                if (int.TryParse(txtResult.Text, out firstNumber))
+                {
+                    calculationCompleted = false;
+                    operation = '*';
+                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                }
+                return;
+            }
+
+            string text = txtUserInput.Text.Trim();
+            if (string.IsNullOrEmpty(text)) return;
+
+            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/'}); // 이미 연산자가 있는지 확인
+            if (existingOp >= 0)
+            {
+                string left = text.Substring(0, existingOp).Trim();
+                if (int.TryParse(left, out firstNumber))
+                {
+                    operation = '*';
+                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                }
+                return;
+            }
+
+            if (int.TryParse(text, out firstNumber))
+            {
+                operation = '*';
+                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+            }
         }
 
 
 
         private void btnCalculatorMinus_Click(object sender, EventArgs e)
         {
-            
+            if (calculationCompleted)
+            {
+                if (int.TryParse(txtResult.Text, out firstNumber))
+                {
+                    calculationCompleted = false;
+                    operation = '-';
+                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                }
+                return;
+            }
+
+            string text = txtUserInput.Text.Trim();
+            if (string.IsNullOrEmpty(text)) return;
+
+            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/'});
+            if (existingOp >= 0)
+            {
+                string left = text.Substring(0, existingOp).Trim();
+                if (int.TryParse(left, out firstNumber))
+                {
+                    operation = '-';
+                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                }
+                return;
+            }
+
+            if (int.TryParse(text, out firstNumber))
+            {
+                operation = '-';
+                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+            }
         }
 
         private void btnCalculatorPlus_Click(object sender, EventArgs e)
@@ -120,6 +181,27 @@ namespace WinFormsApp1
             {
                 result = firstNumber + secondNumber;
             }
+            // 연산자에 따라 계산 수행
+            else if (operation == '-')
+            {
+                result = firstNumber - secondNumber;
+            }
+            else if (operation == '*')
+            {
+                result = firstNumber * secondNumber;
+            }
+            else if (operation == '/')
+            {
+                if (secondNumber != 0)
+                {
+                    result = firstNumber / secondNumber;
+                }
+                else
+                {
+                    MessageBox.Show("0 으로 나눌 수 없습니다.");
+                    return;
+                }
+            }
             else
             {
                 result = 0;
@@ -150,7 +232,37 @@ namespace WinFormsApp1
 
         private void btnCalculatorDivision_Click(object sender, EventArgs e)
         {
-           
+            if (calculationCompleted)
+            {
+                if (int.TryParse(txtResult.Text, out firstNumber))
+                {
+                    calculationCompleted = false;
+                    operation = '/';
+                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                }
+                return;
+            }
+
+            string text = txtUserInput.Text.Trim();
+            if (string.IsNullOrEmpty(text)) return;
+
+            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/'});
+            if (existingOp >= 0)
+            {
+                string left = text.Substring(0, existingOp).Trim();
+                if (int.TryParse(left, out firstNumber))
+                {
+                    operation = '/';
+                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                }
+                return;
+            }
+
+            if (int.TryParse(text, out firstNumber))
+            {
+                operation = '/';
+                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+            }
         }
     }
 }
