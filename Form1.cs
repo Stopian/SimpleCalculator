@@ -13,6 +13,16 @@ namespace WinFormsApp1
             InitializeComponent();
         }
 
+        private int FindOperatorIndex(string text, out char foundOp)
+        {
+            foundOp = '\0';
+            if (string.IsNullOrEmpty(text)) return -1;
+            char[] ops = new char[] { '+', '-', '*', '/', 'X', '÷' };
+            int idx = text.IndexOfAny(ops);
+            if (idx >= 0) foundOp = text[idx];
+            return idx;
+        }
+
         private void NumberButton_Click(object sender, EventArgs e)
         {
             var btn = sender as System.Windows.Forms.Button;
@@ -27,15 +37,16 @@ namespace WinFormsApp1
 
                 if (operation == '\0')
                 {
-                    txtResult.Text = txtUserInput.Text.Trim(); // 결과는 입력한 숫자 그대로 보여줌
+                    txtResult.Text = txtUserInput.Text.Trim();
                 }
                 else
                 {
-                    int opIndex = txtUserInput.Text.IndexOf(operation);
+                    char foundOp;
+                    int opIndex = FindOperatorIndex(txtUserInput.Text, out foundOp);
                     if (opIndex >= 0)
                     {
                         string right = txtUserInput.Text.Substring(opIndex + 1).Trim();
-                        txtResult.Text = string.IsNullOrEmpty(right) ? "0" : right; // 연산자 뒤에 숫자가 없으면 0으로 표시
+                        txtResult.Text = string.IsNullOrEmpty(right) ? "0" : right;
                     }
                     else
                     {
@@ -53,7 +64,8 @@ namespace WinFormsApp1
                 {
                     calculationCompleted = false;
                     operation = '*';
-                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                    char displayOp = operation == '*' ? 'X' : operation;
+                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
                 }
                 return;
             }
@@ -61,14 +73,15 @@ namespace WinFormsApp1
             string text = txtUserInput.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
-            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/'}); // 이미 연산자가 있는지 확인
+            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/', 'X', '÷'}); // 이미 연산자가 있는지 확인
             if (existingOp >= 0)
             {
                 string left = text.Substring(0, existingOp).Trim();
                 if (int.TryParse(left, out firstNumber))
                 {
                     operation = '*';
-                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                    char displayOp = operation == '*' ? 'X' : operation;
+                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
                 }
                 return;
             }
@@ -76,7 +89,8 @@ namespace WinFormsApp1
             if (int.TryParse(text, out firstNumber))
             {
                 operation = '*';
-                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                char displayOp = operation == '*' ? 'X' : operation;
+                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
             }
         }
 
@@ -98,14 +112,15 @@ namespace WinFormsApp1
             string text = txtUserInput.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
-            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/'});
+            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/', 'X', '÷'});
             if (existingOp >= 0)
             {
                 string left = text.Substring(0, existingOp).Trim();
                 if (int.TryParse(left, out firstNumber))
                 {
                     operation = '-';
-                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                    char displayOp = operation;
+                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
                 }
                 return;
             }
@@ -113,7 +128,8 @@ namespace WinFormsApp1
             if (int.TryParse(text, out firstNumber))
             {
                 operation = '-';
-                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                char displayOp = operation;
+                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
             }
         }
 
@@ -122,7 +138,8 @@ namespace WinFormsApp1
             if (int.TryParse(txtUserInput.Text, out firstNumber))
             {
                 operation = '+';// 연산자 설정
-                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                char displayOp = operation;
+                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
             }
         }
 
@@ -153,7 +170,8 @@ namespace WinFormsApp1
 
             
             // 문자열에서 연산자 위치를 찾음 (예: "5 + 3"에서 '+' 위치)
-            int opIndex = txtUserInput.Text.IndexOf(operation);
+            char foundOp;
+            int opIndex = FindOperatorIndex(txtUserInput.Text, out foundOp);
 
             // 연산자 기준으로 좌/우 피연산자 문자열을 얻음
             string left = "";
@@ -163,6 +181,11 @@ namespace WinFormsApp1
                 left = txtUserInput.Text.Substring(0, opIndex).Trim();       // 연산자 왼쪽 부분
                 right = txtUserInput.Text.Substring(opIndex + 1).Trim();     // 연산자 오른쪽 부분
             }
+
+            // foundOp는 화면에 보이는 연산자일 수 있으므로 내부 연산자 기호로 설정
+            char opForCalc = foundOp;
+            if (foundOp == 'X') opForCalc = '*';
+            if (foundOp == '÷') opForCalc = '/';
 
             // 왼쪽 문자열을 정수로 바꿈(실패하면 0으로 설정)
             if (!int.TryParse(left, out firstNumber))
@@ -176,21 +199,19 @@ namespace WinFormsApp1
                 secondNumber = 0;
             }
 
-            // 요청대로 더하기(+) 처리.
-            if (operation == '+')
+            if (opForCalc == '+')
             {
                 result = firstNumber + secondNumber;
             }
-            // 연산자에 따라 계산 수행
-            else if (operation == '-')
+            else if (opForCalc == '-')
             {
                 result = firstNumber - secondNumber;
             }
-            else if (operation == '*')
+            else if (opForCalc == '*')
             {
                 result = firstNumber * secondNumber;
             }
-            else if (operation == '/')
+            else if (opForCalc == '/')
             {
                 if (secondNumber != 0)
                 {
@@ -214,7 +235,7 @@ namespace WinFormsApp1
             txtResult.Text = result.ToString();
 
             // 입력란에 완전한 식과 결과를 표시 (예: "5 + 3 = 8")
-            txtUserInput.Text = $"{firstNumber} {operation} {secondNumber} = {result}";
+            txtUserInput.Text = $"{firstNumber} {foundOp} {secondNumber} = {result}";
 
             // 표시가 끝났음을 표시 다음 숫자 입력 시 새로 시작
             calculationCompleted = true;
@@ -233,7 +254,7 @@ namespace WinFormsApp1
 
         }
 
-        private void btnCalculatorDivision_Click(object sender, EventArgs e)
+        private void btnCalculatorDivision_Click(object sender, EventArgs e) // 나누기 버튼 클릭 이벤트 핸들러
         {
             if (calculationCompleted)
             {
@@ -241,7 +262,8 @@ namespace WinFormsApp1
                 {
                     calculationCompleted = false;
                     operation = '/';
-                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                    char displayOp = operation == '/' ? '÷' : operation;
+                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
                 }
                 return;
             }
@@ -249,14 +271,15 @@ namespace WinFormsApp1
             string text = txtUserInput.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
-            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/'});
+            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/', 'X', '÷'});
             if (existingOp >= 0)
             {
                 string left = text.Substring(0, existingOp).Trim();
                 if (int.TryParse(left, out firstNumber))
                 {
                     operation = '/';
-                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                    char displayOp = operation == '/' ? '÷' : operation;
+                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
                 }
                 return;
             }
@@ -264,7 +287,129 @@ namespace WinFormsApp1
             if (int.TryParse(text, out firstNumber))
             {
                 operation = '/';
-                txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
+                char displayOp = operation == '/' ? '÷' : operation;
+                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
+            }
+        }
+
+        private void btnCalculatorC_Click(object sender, EventArgs e) // 초기화 버튼 클릭 이벤트 핸들러
+        {
+
+            firstNumber = 0;
+            secondNumber = 0;
+            result = 0;
+            operation = '\0';
+            calculationCompleted = false;
+            txtUserInput.Text = string.Empty;
+            txtResult.Text = string.Empty;
+        }
+
+        private void btnCalculatorCE_Click(object sender, EventArgs e)
+        {
+
+            string text = txtUserInput.Text ?? string.Empty;
+
+
+            if (calculationCompleted && text.Contains("="))
+            {
+                string leftOfEq = text.Split('=')[0].Trim(); 
+                int opIndex = leftOfEq.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
+                if (opIndex >= 0)
+                {
+
+                    string left = leftOfEq.Substring(0, opIndex).Trim(); // 왼쪽 피연산자 부분
+                    char op = leftOfEq[opIndex];
+                    operation = op;
+                    txtUserInput.Text = left + " " + operation + " ";
+                    txtResult.Text = left; // 결과도 왼쪽 피연산자 값으로 초기화
+                    calculationCompleted = false;
+                    return;
+                }
+                else
+                {
+
+                    txtUserInput.Text = string.Empty;
+                    txtResult.Text = string.Empty;
+                    calculationCompleted = false;
+                    operation = '\0';
+                    return;
+                }
+            }
+
+
+            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
+            if (existingOp >= 0)
+            {
+
+                string left = text.Substring(0, existingOp).Trim();
+                char op = text[existingOp];
+                if (op == 'X') op = '*';
+                if (op == '÷') op = '/';
+                operation = op;
+                char displayOp = (operation == '*') ? 'X' : (operation == '/') ? '÷' : operation;
+                txtUserInput.Text = left + " " + displayOp + " ";
+                txtResult.Text = left;
+            }
+            else
+            {
+
+                txtUserInput.Text = string.Empty;
+                txtResult.Text = string.Empty;
+                operation = '\0';
+            }
+        }
+
+        private void btnCalculatorDel_Click(object sender, EventArgs e) 
+        {
+
+            if (calculationCompleted)
+            {
+                txtUserInput.Text = string.Empty; 
+                txtResult.Text = string.Empty;
+                calculationCompleted = false;
+                operation = '\0';
+                return;
+            }
+
+            string text = txtUserInput.Text ?? string.Empty;
+            if (string.IsNullOrEmpty(text)) return;
+
+            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
+            if (existingOp >= 0)
+            {
+
+                string left = text.Substring(0, existingOp).Trim();
+                char op = text[existingOp];
+                string right = text.Substring(existingOp + 1).Trim();
+
+                if (string.IsNullOrEmpty(right))
+                {
+
+                    txtUserInput.Text = left;
+                    txtResult.Text = left;
+                    operation = '\0';
+                    return;
+                }
+
+
+                string newRight = right.Substring(0, Math.Max(0, right.Length - 1));
+                if (string.IsNullOrEmpty(newRight))
+                {
+                    txtUserInput.Text = left + " " + op + " ";
+                    txtResult.Text = left;
+                }
+                else
+                {
+                    txtUserInput.Text = left + " " + op + " " + newRight;
+                    txtResult.Text = newRight;
+                }
+            }
+            else
+            {
+
+                string newText = text.Substring(0, Math.Max(0, text.Length - 1));
+                txtUserInput.Text = newText;
+                txtResult.Text = newText;
             }
         }
     }

@@ -90,6 +90,7 @@
             btnCalculatorCE.TabIndex = 3;
             btnCalculatorCE.Text = "CE";
             btnCalculatorCE.UseVisualStyleBackColor = false;
+            btnCalculatorCE.Click += btnCalculatorCE_Click;
             // 
             // btnCalculatorC
             // 
@@ -102,6 +103,7 @@
             btnCalculatorC.TabIndex = 3;
             btnCalculatorC.Text = "C";
             btnCalculatorC.UseVisualStyleBackColor = false;
+            btnCalculatorC.Click += btnCalculatorC_Click;
             // 
             // btnCalculatorDel
             // 
@@ -114,6 +116,7 @@
             btnCalculatorDel.TabIndex = 3;
             btnCalculatorDel.Text = "del";
             btnCalculatorDel.UseVisualStyleBackColor = false;
+            btnCalculatorDel.Click += btnCalculatorDel_Click;
             // 
             // btnCalculatorDivision
             // 
