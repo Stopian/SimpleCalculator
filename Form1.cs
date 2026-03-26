@@ -4,9 +4,9 @@ namespace WinFormsApp1
 {
     public partial class Calculator : System.Windows.Forms.Form
     {
-        int firstNumber = 0;
-        int secondNumber = 0;
-        int result = 0;
+        double firstNumber = 0.0;
+        double secondNumber = 0.0;
+        double result = 0.0;
         char operation = '\0';
         bool calculationCompleted = false;
 
@@ -23,6 +23,159 @@ namespace WinFormsApp1
             int idx = text.IndexOfAny(ops);
             if (idx >= 0) foundOp = text[idx];
             return idx;
+        }
+
+        // % 버튼 처리: 현재 피연산자를 백분율로 변환
+        private void btnPercent_Click(object sender, EventArgs e)
+        {
+            string text = txtUserInput.Text ?? string.Empty;
+            char foundOp;
+            int opIndex = FindOperatorIndex(text, out foundOp);
+
+            if (opIndex >= 0)
+            {
+                string left = text.Substring(0, opIndex).Trim();
+                string right = text.Substring(opIndex + 1).Trim();
+                double l, r;
+                if (!double.TryParse(left, out l)) l = 0.0;
+                if (!double.TryParse(right, out r)) r = 0.0;
+
+                double percentValue;
+                if (foundOp == '+' || foundOp == '-')
+                {
+                    // a + b% -> a + (a * b / 100)
+                    percentValue = l * r / 100.0;
+                }
+                else
+                {
+                    // a * b% or a / b% -> interpret b% as (b / 100)
+                    percentValue = r / 100.0;
+                }
+
+                char displayOp = (foundOp == '*') ? 'X' : (foundOp == '/' ? '÷' : foundOp);
+                txtUserInput.Text = $"{l} {displayOp} {percentValue}";
+                txtResult.Text = percentValue.ToString();
+            }
+            else
+            {
+                double v;
+                if (double.TryParse(text, out v))
+                {
+                    v = v / 100.0;
+                    txtUserInput.Text = v.ToString();
+                    txtResult.Text = v.ToString();
+                }
+            }
+        }
+
+        // 1/x 버튼 처리: 현재 피연산자의 역수를 계산
+        private void btnReciprocal_Click(object sender, EventArgs e)
+        {
+            string text = txtUserInput.Text ?? string.Empty;
+            char foundOp;
+            int opIndex = FindOperatorIndex(text, out foundOp);
+
+            if (opIndex >= 0)
+            {
+                string left = text.Substring(0, opIndex).Trim();
+                string right = text.Substring(opIndex + 1).Trim();
+                double r;
+                if (!double.TryParse(right, out r)) r = 0.0;
+                if (Math.Abs(r) < double.Epsilon)
+                {
+                    MessageBox.Show("0의 역수는 정의되지 않습니다.");
+                    return;
+                }
+                double recip = 1.0 / r;
+                char displayOp = (foundOp == '*') ? 'X' : (foundOp == '/' ? '÷' : foundOp);
+                txtUserInput.Text = $"{left} {displayOp} {recip}";
+                txtResult.Text = recip.ToString();
+            }
+            else
+            {
+                double v;
+                if (double.TryParse(text, out v))
+                {
+                    if (Math.Abs(v) < double.Epsilon)
+                    {
+                        MessageBox.Show("0의 역수는 정의되지 않습니다.");
+                        return;
+                    }
+                    double recip = 1.0 / v;
+                    txtUserInput.Text = recip.ToString();
+                    txtResult.Text = recip.ToString();
+                }
+            }
+        }
+
+        // x^2 버튼 처리: 현재 피연산자 제곱 계산
+        private void btnSquare_Click(object sender, EventArgs e)
+        {
+            string text = txtUserInput.Text ?? string.Empty;
+            char foundOp;
+            int opIndex = FindOperatorIndex(text, out foundOp);
+
+            if (opIndex >= 0)
+            {
+                string left = text.Substring(0, opIndex).Trim();
+                string right = text.Substring(opIndex + 1).Trim();
+                double r;
+                if (!double.TryParse(right, out r)) r = 0.0;
+                double sq = r * r;
+                char displayOp = (foundOp == '*') ? 'X' : (foundOp == '/' ? '÷' : foundOp);
+                txtUserInput.Text = $"{left} {displayOp} {sq}";
+                txtResult.Text = sq.ToString();
+            }
+            else
+            {
+                double v;
+                if (double.TryParse(text, out v))
+                {
+                    double sq = v * v;
+                    txtUserInput.Text = sq.ToString();
+                    txtResult.Text = sq.ToString();
+                }
+            }
+        }
+
+        // 루트 버튼 처리: 현재 피연산자의 제곱근 계산
+        private void btnSqrt_Click(object sender, EventArgs e)
+        {
+            string text = txtUserInput.Text ?? string.Empty;
+            char foundOp;
+            int opIndex = FindOperatorIndex(text, out foundOp);
+
+            if (opIndex >= 0)
+            {
+                string left = text.Substring(0, opIndex).Trim();
+                string right = text.Substring(opIndex + 1).Trim();
+                double r;
+                if (!double.TryParse(right, out r)) r = 0.0;
+                if (r < 0)
+                {
+                    MessageBox.Show("음수의 제곱근은 허용되지 않습니다.");
+                    return;
+                }
+                double sqr = Math.Sqrt(r);
+                char displayOp = (foundOp == '*') ? 'X' : (foundOp == '/' ? '÷' : foundOp);
+                txtUserInput.Text = $"{left} {displayOp} {sqr}";
+                txtResult.Text = sqr.ToString();
+            }
+            else
+            {
+                double v;
+                if (double.TryParse(text, out v))
+                {
+                    if (v < 0)
+                    {
+                        MessageBox.Show("음수의 제곱근은 허용되지 않습니다.");
+                        return;
+                    }
+                    double sqr = Math.Sqrt(v);
+                    txtUserInput.Text = sqr.ToString();
+                    txtResult.Text = sqr.ToString();
+                }
+            }
         }
 
         private void NumberButton_Click(object sender, EventArgs e)
@@ -208,19 +361,22 @@ namespace WinFormsApp1
 
         }
 
+        // 루트 버튼 이벤트: 루트 처리 메서드 호출
         private void btnRoot_Click(object sender, EventArgs e)
         {
-
+            btnSqrt_Click(sender, e);
         }
 
+        // 1/x 버튼 이벤트: 역수 처리 메서드 호출
         private void button1_Click(object sender, EventArgs e)
         {
-
+            btnReciprocal_Click(sender, e);
         }
 
+        // % 버튼 이벤트: 퍼센트 처리 메서드 호출
         private void btnCalculatorPercentage_Click(object sender, EventArgs e)
         {
-
+            btnPercent_Click(sender, e);
         }
 
         private void btnLParentheses_Click(object sender, EventArgs e)
@@ -239,10 +395,7 @@ namespace WinFormsApp1
             operation = '\0';
         }
 
-        private void btnSquare_Click(object sender, EventArgs e)
-        {
 
-        }
 
         private void btnRParentheses_Click(object sender, EventArgs e)
         {
