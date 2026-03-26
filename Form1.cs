@@ -199,6 +199,9 @@ namespace WinFormsApp1
                 else
                 {
                     MessageBox.Show("0 으로 나눌 수 없습니다.");
+
+                    calculationCompleted = true; // 계산이 완료된 상태로 설정하여 다음 입력 시 새로 시작하도록 함
+                    operation = '\0';
                     return;
                 }
             }
