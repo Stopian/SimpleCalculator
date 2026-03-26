@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace WinFormsApp1
 {
     public partial class Calculator : System.Windows.Forms.Form
@@ -25,223 +27,97 @@ namespace WinFormsApp1
 
         private void NumberButton_Click(object sender, EventArgs e)
         {
-            var btn = sender as System.Windows.Forms.Button;
-            if (btn != null)
-            {
-                if (calculationCompleted)
-                {
-                    txtUserInput.Text = string.Empty;
-                    calculationCompleted = false;
-                }
-                txtUserInput.Text += btn.Text;
-
-                if (operation == '\0')
-                {
-                    txtResult.Text = txtUserInput.Text.Trim();
-                }
-                else
-                {
-                    char foundOp;
-                    int opIndex = FindOperatorIndex(txtUserInput.Text, out foundOp);
-                    if (opIndex >= 0)
-                    {
-                        string right = txtUserInput.Text.Substring(opIndex + 1).Trim();
-                        txtResult.Text = string.IsNullOrEmpty(right) ? "0" : right;
-                    }
-                    else
-                    {
-                        txtResult.Text = "0";
-                    }
-                }
-            }
-        }
-        private void btnCalculatorMultiplied_Click(object sender, EventArgs e)
-        {
+            var btn = sender as Button;
+            if (btn == null) return;
 
             if (calculationCompleted)
             {
-                if (int.TryParse(txtResult.Text, out firstNumber))
-                {
-                    calculationCompleted = false;
-                    operation = '*';
-                    char displayOp = operation == '*' ? 'X' : operation;
-                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-                }
-                return;
+                txtUserInput.Text = string.Empty;
+                txtResult.Text = "0";
+                calculationCompleted = false;
             }
 
-            string text = txtUserInput.Text.Trim();
-            if (string.IsNullOrEmpty(text)) return;
+            // 1. 전체 수식에 숫자 추가
+            txtUserInput.Text += btn.Text;
 
-            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' }); // 이미 연산자가 있는지 확인
-            if (existingOp >= 0)
+            // 2. txtResult에 현재 입력 중인 "마지막 숫자 뭉치"만 표시
+            // 예: "48 + 12" 입력 중이면 "12"만 추출
+            string currentInput = txtUserInput.Text;
+            char[] operators = new char[] { '+', '-', '*', '/', 'X', '÷', '(', ')' };
+
+            string[] parts = currentInput.Split(operators, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length > 0)
             {
-                string left = text.Substring(0, existingOp).Trim();
-                if (int.TryParse(left, out firstNumber))
-                {
-                    operation = '*';
-                    char displayOp = operation == '*' ? 'X' : operation;
-                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-                }
-                return;
+                // 가장 마지막에 있는 숫자 뭉치를 가져와서 결과창에 표시
+                txtResult.Text = parts[parts.Length - 1].Trim();
+            }
+        }
+        private void AppendOperator(string opChar)
+        {
+            if (calculationCompleted)
+            {
+                // 계산 완료 후 연산자를 누르면 결과값에서 이어서 시작
+                txtUserInput.Text = txtResult.Text;
+                calculationCompleted = false;
             }
 
-            if (int.TryParse(text, out firstNumber))
+            if (!string.IsNullOrEmpty(txtUserInput.Text))
             {
-                operation = '*';
-                char displayOp = operation == '*' ? 'X' : operation;
-                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
+                txtUserInput.Text += " " + opChar + " ";
             }
+        }
+
+
+
+        private void btnCalculatorMultiplied_Click(object sender, EventArgs e)
+        {
+
+            AppendOperator("X");
         }
 
 
 
         private void btnCalculatorMinus_Click(object sender, EventArgs e)
         {
-            if (calculationCompleted)
-            {
-                if (int.TryParse(txtResult.Text, out firstNumber))
-                {
-                    calculationCompleted = false;
-                    operation = '-';
-                    txtUserInput.Text = firstNumber.ToString() + " " + operation + " ";
-                }
-                return;
-            }
-
-            string text = txtUserInput.Text.Trim();
-            if (string.IsNullOrEmpty(text)) return;
-
-            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
-            if (existingOp >= 0)
-            {
-                string left = text.Substring(0, existingOp).Trim();
-                if (int.TryParse(left, out firstNumber))
-                {
-                    operation = '-';
-                    char displayOp = operation;
-                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-                }
-                return;
-            }
-
-            if (int.TryParse(text, out firstNumber))
-            {
-                operation = '-';
-                char displayOp = operation;
-                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-            }
+            AppendOperator("-");
         }
 
         private void btnCalculatorPlus_Click(object sender, EventArgs e)
         {
-            if (int.TryParse(txtUserInput.Text, out firstNumber))
-            {
-                operation = '+';// 연산자 설정
-                char displayOp = operation;
-                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-            }
+            AppendOperator("+");
         }
 
         private void btnCalculatorEqual_Click(object sender, EventArgs e)
         {
-            string input = txtUserInput.Text?.Trim();// txtUserInput이 null일 수 있으므로 null 체크 후 Trim() 호출
-
-            if (string.IsNullOrEmpty(input) && operation == '\0') // 입력이 없고 연산자도 없는 경우
+            try
             {
-                result = 0;
-                txtResult.Text = "0";
-                return;
-            }
+                string input = txtUserInput.Text?.Trim();
+                if (string.IsNullOrEmpty(input)) return;
 
-            if (!string.IsNullOrEmpty(input) && operation == '\0') // 입력이 있고 연산자 없는 경우 (단일 숫자 입력)
+                // 1. 생략된 곱셈 기호 자동 삽입 (전처리)
+                // 숫자(0-9) 또는 ')' 뒤에 '('가 오면 그 사이에 '*' 삽입
+                string processedInput = System.Text.RegularExpressions.Regex.Replace(input, @"(\d|\))(?=\()", "$1 * ");
+                // ')' 뒤에 숫자(0-9)가 오면 그 사이에 '*' 삽입
+                processedInput = System.Text.RegularExpressions.Regex.Replace(processedInput, @"(\))(?=\d)", "$1 * ");
+
+                // 2. 계산을 위해 화면용 기호 치환 (X -> *, ÷ -> /)
+                string expression = processedInput.Replace("X", "*").Replace("÷", "/");
+
+                // 3. DataTable을 이용한 수식 계산
+                DataTable table = new DataTable();
+                var evalResult = table.Compute(expression, "");
+
+                // 4. 결과값 처리 (소수점 등 대응을 위해 double로 변환 후 출력 권장)
+                txtResult.Text = evalResult.ToString();
+                txtUserInput.Text = $"{input} = {evalResult}";
+                calculationCompleted = true;
+                operation = '\0';
+            }
+            catch (Exception)
             {
-                if (int.TryParse(input, out int singleValue))
-                {
-                    result = singleValue;
-                    txtResult.Text = result.ToString();// 입력한 숫자 그대로 결과 표시
-                }
-                else
-                {
-                    txtResult.Text = "0";
-                }
-                return;
+                MessageBox.Show("수식이 잘못되었습니다. 괄호와 연산자 배치를 확인하세요.");
             }
-
-
-            // 문자열에서 연산자 위치를 찾음 (예: "5 + 3"에서 '+' 위치)
-            char foundOp;
-            int opIndex = FindOperatorIndex(txtUserInput.Text, out foundOp);
-
-            // 연산자 기준으로 좌/우 피연산자 문자열을 얻음
-            string left = "";
-            string right = "";
-            if (opIndex >= 0)
-            {
-                left = txtUserInput.Text.Substring(0, opIndex).Trim();       // 연산자 왼쪽 부분
-                right = txtUserInput.Text.Substring(opIndex + 1).Trim();     // 연산자 오른쪽 부분
-            }
-
-            // foundOp는 화면에 보이는 연산자일 수 있으므로 내부 연산자 기호로 설정
-            char opForCalc = foundOp;
-            if (foundOp == 'X') opForCalc = '*';
-            if (foundOp == '÷') opForCalc = '/';
-
-            // 왼쪽 문자열을 정수로 바꿈(실패하면 0으로 설정)
-            if (!int.TryParse(left, out firstNumber))
-            {
-                firstNumber = 0;
-            }
-
-            // 오른쪽 문자열을 정수로 바꿈(실패하면 0으로 설정)
-            if (!int.TryParse(right, out secondNumber))
-            {
-                secondNumber = 0;
-            }
-
-            if (opForCalc == '+')
-            {
-                result = firstNumber + secondNumber;
-            }
-            else if (opForCalc == '-')
-            {
-                result = firstNumber - secondNumber;
-            }
-            else if (opForCalc == '*')
-            {
-                result = firstNumber * secondNumber;
-            }
-            else if (opForCalc == '/')
-            {
-                if (secondNumber != 0)
-                {
-                    result = firstNumber / secondNumber;
-                }
-                else
-                {
-                    MessageBox.Show("0 으로 나눌 수 없습니다.");
-
-                    calculationCompleted = true; // 계산이 완료된 상태로 설정하여 다음 입력 시 새로 시작하도록 함
-                    operation = '\0';
-                    return;
-                }
-            }
-            else
-            {
-                result = 0;
-            }
-
-            // 결과를 보여줌
-            txtResult.Text = result.ToString();
-
-            // 입력란에 완전한 식과 결과를 표시 (예: "5 + 3 = 8")
-            txtUserInput.Text = $"{firstNumber} {foundOp} {secondNumber} = {result}";
-
-            // 표시가 끝났음을 표시 다음 숫자 입력 시 새로 시작
-            calculationCompleted = true;
-
-            // 다음 계산을 위해 연산자 상태 초기화
-            operation = '\0';
         }
 
         private void btnCalculatorDecimal_Click(object sender, EventArgs e)
@@ -256,53 +132,10 @@ namespace WinFormsApp1
 
         private void btnCalculatorDivision_Click(object sender, EventArgs e) // 나누기 버튼 클릭 이벤트 핸들러
         {
-            if (calculationCompleted)
-            {
-                if (int.TryParse(txtResult.Text, out firstNumber))
-                {
-                    calculationCompleted = false;
-                    operation = '/';
-                    char displayOp = operation == '/' ? '÷' : operation;
-                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-                }
-                return;
-            }
-
-            string text = txtUserInput.Text.Trim();
-            if (string.IsNullOrEmpty(text)) return;
-
-            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
-            if (existingOp >= 0)
-            {
-                string left = text.Substring(0, existingOp).Trim();
-                if (int.TryParse(left, out firstNumber))
-                {
-                    operation = '/';
-                    char displayOp = operation == '/' ? '÷' : operation;
-                    txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-                }
-                return;
-            }
-
-            if (int.TryParse(text, out firstNumber))
-            {
-                operation = '/';
-                char displayOp = operation == '/' ? '÷' : operation;
-                txtUserInput.Text = firstNumber.ToString() + " " + displayOp + " ";
-            }
+            AppendOperator("÷");
         }
 
-        private void btnCalculatorC_Click(object sender, EventArgs e) // 초기화 버튼 클릭 이벤트 핸들러
-        {
 
-            firstNumber = 0;
-            secondNumber = 0;
-            result = 0;
-            operation = '\0';
-            calculationCompleted = false;
-            txtUserInput.Text = string.Empty;
-            txtResult.Text = string.Empty;
-        }
 
         private void btnCalculatorCE_Click(object sender, EventArgs e)
         {
@@ -362,60 +195,58 @@ namespace WinFormsApp1
         private void btnCalculatorDel_Click(object sender, EventArgs e)
         {
 
-            if (calculationCompleted)
+            if (calculationCompleted) { btnCalculatorC_Click(null, null); return; }
+            string text = txtUserInput.Text;
+            if (text.Length > 0)
             {
-                txtUserInput.Text = string.Empty;
-                txtResult.Text = string.Empty;
-                calculationCompleted = false;
-                operation = '\0';
-                return;
-            }
-
-            string text = txtUserInput.Text ?? string.Empty;
-            if (string.IsNullOrEmpty(text)) return;
-
-            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
-            if (existingOp >= 0)
-            {
-
-                string left = text.Substring(0, existingOp).Trim();
-                char op = text[existingOp];
-                string right = text.Substring(existingOp + 1).Trim();
-
-                if (string.IsNullOrEmpty(right))
-                {
-
-                    txtUserInput.Text = left;
-                    txtResult.Text = left;
-                    operation = '\0';
-                    return;
-                }
-
-
-                string newRight = right.Substring(0, Math.Max(0, right.Length - 1));
-                if (string.IsNullOrEmpty(newRight))
-                {
-                    txtUserInput.Text = left + " " + op + " ";
-                    txtResult.Text = left;
-                }
-                else
-                {
-                    txtUserInput.Text = left + " " + op + " " + newRight;
-                    txtResult.Text = newRight;
-                }
-            }
-            else
-            {
-
-                string newText = text.Substring(0, Math.Max(0, text.Length - 1));
-                txtUserInput.Text = newText;
-                txtResult.Text = newText;
+                txtUserInput.Text = text.Substring(0, text.Length - 1);
             }
         }
 
         private void Calculator_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnRoot_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCalculatorPercentage_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnLParentheses_Click(object sender, EventArgs e)
+        {
+            if (calculationCompleted) { txtUserInput.Text = "("; calculationCompleted = false; }
+            else txtUserInput.Text += "(";
+        }
+
+
+        // 기존 초기화/삭제 기능 유지
+        private void btnCalculatorC_Click(object sender, EventArgs e)
+        {
+            txtUserInput.Text = string.Empty;
+            txtResult.Text = "0";
+            calculationCompleted = false;
+            operation = '\0';
+        }
+
+        private void btnSquare_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRParentheses_Click(object sender, EventArgs e)
+        {
+            txtUserInput.Text += ")";
         }
     }
 }
