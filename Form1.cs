@@ -73,7 +73,7 @@ namespace WinFormsApp1
             string text = txtUserInput.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
-            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/', 'X', '÷'}); // 이미 연산자가 있는지 확인
+            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' }); // 이미 연산자가 있는지 확인
             if (existingOp >= 0)
             {
                 string left = text.Substring(0, existingOp).Trim();
@@ -112,7 +112,7 @@ namespace WinFormsApp1
             string text = txtUserInput.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
-            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/', 'X', '÷'});
+            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
             if (existingOp >= 0)
             {
                 string left = text.Substring(0, existingOp).Trim();
@@ -168,7 +168,7 @@ namespace WinFormsApp1
                 return;
             }
 
-            
+
             // 문자열에서 연산자 위치를 찾음 (예: "5 + 3"에서 '+' 위치)
             char foundOp;
             int opIndex = FindOperatorIndex(txtUserInput.Text, out foundOp);
@@ -271,7 +271,7 @@ namespace WinFormsApp1
             string text = txtUserInput.Text.Trim();
             if (string.IsNullOrEmpty(text)) return;
 
-            int existingOp = text.IndexOfAny(new char[] {'+', '-', '*', '/', 'X', '÷'});
+            int existingOp = text.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
             if (existingOp >= 0)
             {
                 string left = text.Substring(0, existingOp).Trim();
@@ -312,7 +312,7 @@ namespace WinFormsApp1
 
             if (calculationCompleted && text.Contains("="))
             {
-                string leftOfEq = text.Split('=')[0].Trim(); 
+                string leftOfEq = text.Split('=')[0].Trim();
                 int opIndex = leftOfEq.IndexOfAny(new char[] { '+', '-', '*', '/', 'X', '÷' });
                 if (opIndex >= 0)
                 {
@@ -359,12 +359,12 @@ namespace WinFormsApp1
             }
         }
 
-        private void btnCalculatorDel_Click(object sender, EventArgs e) 
+        private void btnCalculatorDel_Click(object sender, EventArgs e)
         {
 
             if (calculationCompleted)
             {
-                txtUserInput.Text = string.Empty; 
+                txtUserInput.Text = string.Empty;
                 txtResult.Text = string.Empty;
                 calculationCompleted = false;
                 operation = '\0';
@@ -411,6 +411,11 @@ namespace WinFormsApp1
                 txtUserInput.Text = newText;
                 txtResult.Text = newText;
             }
+        }
+
+        private void Calculator_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

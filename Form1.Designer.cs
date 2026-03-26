@@ -368,6 +368,7 @@
             Controls.Add(lblCalculator);
             Name = "Calculator";
             Text = "Calculator v1.0";
+            Load += Calculator_Load;
             ResumeLayout(false);
             PerformLayout();
         }
